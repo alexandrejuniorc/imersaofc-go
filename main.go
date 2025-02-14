@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"math/rand/v2"
 	"net/http"
 	"time"
 )
@@ -36,16 +37,26 @@ func counter(count int) {
 	}
 }
 
+func worker(workerID int, data chan int) {
+	for x := range data {
+		fmt.Printf("Worker %d: received %d\n", workerID, x)
+		// Generates a random time between 1 and 5 seconds
+		randSleep := time.Duration(rand.IntN(5)+1) * time.Second
+		time.Sleep(randSleep) // Simulates a hard work
+	}
+}
+
 // Thread 1 (goroutine)
 func main() {
-	channel := make(chan string)
+	data := make(chan int)
+	workersQuantity := 10
 
-	// Thread 2 (goroutine)
-	go func() {
-		channel <- "Hello from goroutine" // Channel is full until a message is received
-	}()
+	// Runs goroutine using 10 workers
+	for i := 0; i < workersQuantity; i++ {
+		go worker(i, data)
+	}
 
-	// The main goroutine will wait for the other goroutine to finish
-	message := <-channel // Channel is empty until a message is received
-	fmt.Println(message) // Hello from goroutine
+	for i := range 100 {
+		data <- i
+	}
 }
