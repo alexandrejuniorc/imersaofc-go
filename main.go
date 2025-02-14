@@ -2,7 +2,9 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"time"
 )
 
 type Product struct {
@@ -27,7 +29,14 @@ func getProducts(writer http.ResponseWriter, request *http.Request) {
 	json.NewEncoder(writer).Encode(products)
 }
 
+func counter(count int) {
+	for i := 0; i < count; i++ {
+		fmt.Println(i)
+		time.Sleep(time.Second)
+	}
+}
+
 func main() {
-	http.HandleFunc("/products", getProducts)
-	http.ListenAndServe(":8080", nil)
+	go counter(10) // creates a new goroutine -> runs concurrently
+	counter(10)
 }
