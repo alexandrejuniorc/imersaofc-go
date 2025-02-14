@@ -36,7 +36,16 @@ func counter(count int) {
 	}
 }
 
+// Thread 1 (goroutine)
 func main() {
-	go counter(10) // creates a new goroutine -> runs concurrently
-	counter(10)
+	channel := make(chan string)
+
+	// Thread 2 (goroutine)
+	go func() {
+		channel <- "Hello from goroutine" // Channel is full until a message is received
+	}()
+
+	// The main goroutine will wait for the other goroutine to finish
+	message := <-channel // Channel is empty until a message is received
+	fmt.Println(message) // Hello from goroutine
 }
