@@ -2,10 +2,7 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
-	"math/rand/v2"
 	"net/http"
-	"time"
 )
 
 type Product struct {
@@ -28,35 +25,4 @@ var products = []Product{
 func getProducts(writer http.ResponseWriter, request *http.Request) {
 	writer.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(writer).Encode(products)
-}
-
-func counter(count int) {
-	for i := 0; i < count; i++ {
-		fmt.Println(i)
-		time.Sleep(time.Second)
-	}
-}
-
-func worker(workerID int, data chan int) {
-	for x := range data {
-		fmt.Printf("Worker %d: received %d\n", workerID, x)
-		// Generates a random time between 1 and 5 seconds
-		randSleep := time.Duration(rand.IntN(5)+1) * time.Second
-		time.Sleep(randSleep) // Simulates a hard work
-	}
-}
-
-// Thread 1 (goroutine)
-func main() {
-	data := make(chan int)
-	workersQuantity := 10
-
-	// Runs goroutine using 10 workers
-	for i := 0; i < workersQuantity; i++ {
-		go worker(i, data)
-	}
-
-	for i := range 100 {
-		data <- i
-	}
 }
